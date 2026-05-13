@@ -6,5 +6,6 @@ namespace CarpinteriaBA.Entities
 {
     public class Cliente
     {
+
     }
 }

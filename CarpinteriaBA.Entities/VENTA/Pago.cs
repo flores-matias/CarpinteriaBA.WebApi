@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CarpinteriaBA.Entities
+namespace CarpinteriaBA.Entities.VENTA
 {
-    public class Pedido
+    public class Pago
     {
+        
     }
 }

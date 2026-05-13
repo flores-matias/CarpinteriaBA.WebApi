@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CarpinteriaBA.Entities
+namespace CarpinteriaBA.Entities.PRODUCTO
 {
-    public class Insumo
+    public class RecetaMueble
     {
     }
 }
