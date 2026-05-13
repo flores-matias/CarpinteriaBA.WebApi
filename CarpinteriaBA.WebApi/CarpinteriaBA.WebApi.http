@@ -1,0 +1,6 @@
+@CarpinteriaBA.WebApi_HostAddress = http://localhost:5062
+
+GET {{CarpinteriaBA.WebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

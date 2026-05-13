@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="CarpinteriaBA.Abstactions/CarpinteriaBA.Abstactions.csproj" />
+  <Project Path="CarpinteriaBA.Application/CarpinteriaBA.Application.csproj" />
+  <Project Path="CarpinteriaBA.DataAccess/CarpinteriaBA.DataAccess.csproj" />
+  <Project Path="CarpinteriaBA.Entities/CarpinteriaBA.Entities.csproj" />
+  <Project Path="CarpinteriaBA.Enums/CarpinteriaBA.Enums.csproj" />
+  <Project Path="CarpinteriaBA.Repository/CarpinteriaBA.Repository.csproj" />
+  <Project Path="CarpinteriaBA.Services/CarpinteriaBA.Services.csproj" />
+  <Project Path="CarpinteriaBA.WebApi/CarpinteriaBA.WebApi.csproj" />
+</Solution>
