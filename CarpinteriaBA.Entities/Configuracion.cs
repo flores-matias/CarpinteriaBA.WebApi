@@ -6,5 +6,9 @@ namespace CarpinteriaBA.Entities
 {
     public class Configuracion
     {
+        public int IdConfiguracion { get; set; }
+        public string Clave { get; set; } = null!;
+        public decimal Valor { get; set; }
+        public string Descripcion { get; set; } = null!;
     }
 }
