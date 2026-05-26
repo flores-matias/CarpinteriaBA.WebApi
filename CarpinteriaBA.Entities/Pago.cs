@@ -1,14 +1,15 @@
-﻿using CarpinteriaBA.Entities.PRODUCTO;
+﻿using CarpinteriaBA.Abstactions;
+using CarpinteriaBA.Entities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace CarpinteriaBA.Entities.VENTA
+namespace CarpinteriaBA.Entities
 {
-    public class Pago
+    public class Pago:IEntidad
     {
-        public int IdPago { get; set; }
+        public int Id { get; set; }
         [ForeignKey(nameof(TipoPago))]
         public int IdTipoPago { get; set; }
         public virtual TipoPago TipoPago { get; set; } //= null!;

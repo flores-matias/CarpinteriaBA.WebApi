@@ -1,19 +1,20 @@
-﻿using CarpinteriaBA.Entities.PRODUCTO;
+﻿using CarpinteriaBA.Abstactions;
+using CarpinteriaBA.Entities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace CarpinteriaBA.Entities.VENTA
+namespace CarpinteriaBA.Entities
 {
-    public class Pedido
+    public class Pedido:IEntidad
     {
         public Pedido()
         {
             DetallesPedidos = new HashSet<DetallePedido>();
             Pagos = new HashSet<Pago>();
         }
-        public int IdPedido { get; set; }
+        public int Id { get; set; }
         [ForeignKey(nameof(Cliente))]
         public int IdCliente { get; set; }
         public virtual Cliente Cliente { get; set; }

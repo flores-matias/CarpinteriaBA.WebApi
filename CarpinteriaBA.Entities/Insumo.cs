@@ -1,18 +1,19 @@
-﻿using System;
+﻿using CarpinteriaBA.Abstactions;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace CarpinteriaBA.Entities.PRODUCTO
+namespace CarpinteriaBA.Entities
 {
-    public class Insumo
+    public class Insumo:IEntidad
     {
         public Insumo()
         {
             RecetasMuebles = new HashSet<RecetaMueble>();
         }
-        public int IdInsumo { get; set; }
+        public int Id { get; set; }
 
         [StringLength(30)]
         public string Nombre { get; set; }
@@ -24,5 +25,6 @@ namespace CarpinteriaBA.Entities.PRODUCTO
         public int IdProveedor { get; set; }
         public virtual Proveedor Proveedor { get; set; }
         public virtual ICollection<RecetaMueble> RecetasMuebles { get; set; }
+        
     }
 }

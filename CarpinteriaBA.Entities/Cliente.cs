@@ -1,4 +1,4 @@
-﻿using CarpinteriaBA.Entities.VENTA;
+﻿using CarpinteriaBA.Abstactions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -6,13 +6,13 @@ using System.Text;
 
 namespace CarpinteriaBA.Entities
 {
-    public class Cliente
+    public class Cliente:IEntidad
     {
         public Cliente()
         {
             Pedidos = new HashSet<Pedido>();
         }
-        public int IdCliente { get; set; }
+        public int Id { get; set; }
         [StringLength(30)]
         public string Nombre { get; set; } = null!;
         [StringLength(30)]

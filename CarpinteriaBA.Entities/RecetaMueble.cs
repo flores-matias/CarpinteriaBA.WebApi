@@ -1,13 +1,14 @@
-﻿using System;
+﻿using CarpinteriaBA.Abstactions;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace CarpinteriaBA.Entities.PRODUCTO
+namespace CarpinteriaBA.Entities
 {
-    public class RecetaMueble
+    public class RecetaMueble:IEntidad
     {
-        public int IdRecetaMueble { get; set; }
+        public int Id { get; set; }
         [ForeignKey(nameof(Mueble))]
         public int IdMueble { get; set; }
         public virtual Mueble Mueble { get; set; }//= null!;
