@@ -21,7 +21,7 @@ namespace CarpinteriaBA.DataAccess
         public virtual DbSet<Cliente> Clientes { get; set; }
         public virtual DbSet<Configuracion> Configuraciones { get; set; }
 
-        public DbDataAccess(DbContextOptions<DbDataAccess> options) : base(options){}
+        public DbDataAccess(DbContextOptions<DbDataAccess> options) : base(options) { }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.LogTo(Console.WriteLine).EnableDetailedErrors();//aca estoy configurando el log para que me muestre los errores detallados en la consola,
                                                                                                                                                         //esto es para poder debuggear mejor y ver que esta pasando con las consultas a la base de datos.
                                                                                                                                                         //Cuando hablo de log me refiero a que me muestre en la consola las consultas SQL que se estan
