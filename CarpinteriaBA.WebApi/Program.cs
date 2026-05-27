@@ -14,7 +14,7 @@ builder.Services.AddControllers();
 //builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+//chequeoDeSwagger
 builder.Services.AddDbContext<DbDataAccess>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
