@@ -69,12 +69,6 @@ namespace CarpinteriaBA.WebApi.Controllers
             Cliente clienteBack = _cliente.GetById(Id.Value);
             if (clienteBack is null)
             { return NotFound(); }
-            //var cliente = _mapper.Map<Cliente>(clienteRequestDto);
-            //clienteBack.Nombre = cliente.Nombre;
-            //clienteBack.Apellido = cliente.Apellido;
-            //clienteBack.Telefono = cliente.Telefono;
-            //clienteBack.Direccion = cliente.Direccion;
-            //clienteBack.Email = cliente.Email;
             _mapper.Map(clienteRequestDto, clienteBack);
             _cliente.Save(clienteBack);
             return Ok();
