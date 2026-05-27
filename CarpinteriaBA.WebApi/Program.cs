@@ -22,6 +22,7 @@ builder.Services.AddDbContext<DbDataAccess>(options =>
     options.UseLazyLoadingProxies();
 });
 
+builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped(typeof(IStringService), typeof(StringService));
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped(typeof(IApplication<>), typeof(Application<>));

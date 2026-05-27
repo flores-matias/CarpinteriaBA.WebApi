@@ -5,17 +5,13 @@ using System.Text;
 
 namespace CarpinteriaBA.Application.DTOs.Cliente
 {
-    public class ClienteRequestDto
+    public class ClienteResponseDto
     {
-        
-        [StringLength(30)]
+        public int Id { get; set; }
         public string Nombre { get; set; } = null!;
-        [StringLength(30)]
         public string Apellido { get; set; } = null!;
-        [StringLength(20)]
         public string Telefono { get; set; } = null!;
         public string Direccion { get; set; } = null!;
-        [DataType(DataType.EmailAddress)]
         public string Email { get; set; } = null!;
     }
 }
