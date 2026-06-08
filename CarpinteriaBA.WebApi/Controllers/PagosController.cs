@@ -1,36 +1,39 @@
 ﻿using AutoMapper;
 using CarpinteriaBA.Application;
 using CarpinteriaBA.Application.DTOs.Cliente;
+using CarpinteriaBA.Application.DTOs.Pago;
 using CarpinteriaBA.Entities;
 using CarpinteriaBA.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarpinteriaBA.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ClientesController:ControllerBase
+    public class PagosController : ControllerBase
     {
-        private readonly ILogger<ClientesController> _logger;
+        private readonly ILogger<PagosController> _logger;
         private readonly IStringService _stringService;
-        private readonly IApplication<Cliente> _cliente;
+        private readonly IApplication<Pago> _pago;
         private readonly IMapper _mapper;
 
-        public ClientesController(ILogger<ClientesController> logger, 
-            IStringService stringService, 
-            IApplication<Cliente> cliente,
+        public PagosController(ILogger<PagosController> logger,
+            IStringService stringService,
+            IApplication<Pago> pago,
             IMapper mapper)
         {
             _logger = logger;
             _stringService = stringService;
-            _cliente = cliente;
+            _pago = pago;
             _mapper = mapper;
         }
+
         [HttpGet]
         [Route("All")]
         public async Task<IActionResult> All()
         {
-            return Ok(_mapper.Map<IList<ClienteResponseDto>>(_cliente.GetAll()));
+            return Ok(_mapper.Map<IList<PagoResponseDto>>(_pago.GetAll()));
         }
 
         [HttpGet]
@@ -41,26 +44,26 @@ namespace CarpinteriaBA.WebApi.Controllers
             {
                 return BadRequest();
             }
-            Cliente cliente = _cliente.GetById(Id.Value);
-            if (cliente is null)
+            Pago pago = _pago.GetById(Id.Value);
+            if (pago is null)
             {
                 return NotFound();
             }
-            return Ok(_mapper.Map<ClienteResponseDto>(cliente));
+            return Ok(_mapper.Map<PagoResponseDto>(pago));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Crear(ClienteRequestDto clienteRequestDto)
+        public async Task<IActionResult> Crear(PagoRequestDto pagoRequestDto)
         {
             if (!ModelState.IsValid)
             { return BadRequest(); }
-            var cliente = _mapper.Map<Cliente>(clienteRequestDto);
-            _cliente.Save(cliente);
-            return Ok(cliente.Id);
+            var pago = _mapper.Map<Pago>(pagoRequestDto);
+            _pago.Save(pago);
+            return Ok(pago.Id);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Editar(int? Id, ClienteRequestDto clienteRequestDto)
+        public async Task<IActionResult> Editar(int? Id, PagoRequestDto pagoRequestDto)
         {
             if (!Id.HasValue)
             { return BadRequest(); }
@@ -68,14 +71,14 @@ namespace CarpinteriaBA.WebApi.Controllers
             if (!ModelState.IsValid)
             { return BadRequest(); }
 
-            Cliente clienteBack = _cliente.GetById(Id.Value);
+            Pago pagoBack = _pago.GetById(Id.Value);
 
-            if (clienteBack is null)
+            if (pagoBack is null)
             { return NotFound(); }
 
-            _mapper.Map(clienteRequestDto, clienteBack);
+            _mapper.Map(pagoRequestDto, pagoBack);
 
-            _cliente.Save(clienteBack);
+            _pago.Save(pagoBack);
 
             return Ok();
         }
@@ -85,10 +88,10 @@ namespace CarpinteriaBA.WebApi.Controllers
         {
             if (!Id.HasValue)
             { return BadRequest(); }
-            Cliente clienteBack = _cliente.GetById(Id.Value);
-            if (clienteBack is null)
+            Pago pagoBack = _pago.GetById(Id.Value);
+            if (pagoBack is null)
             { return NotFound(); }
-            _cliente.Delete(clienteBack.Id);
+            _pago.Delete(pagoBack.Id);
             return Ok();
         }
     }

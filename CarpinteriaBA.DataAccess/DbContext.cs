@@ -43,10 +43,13 @@ namespace CarpinteriaBA.DataAccess
             }
             else
             {
+                //DE ACA 
                 var entityDb=GetById(entity.Id);
                 _ctx.Entry(entityDb).State = EntityState.Modified;//aca le digo a EF que la entidad que estoy pasando es una entidad modificada, para
                                                                   //que EF sepa que tiene que actualizarla en la base de datos, y no agregarla como una
                                                                   //nueva entidad.
+
+                //HASTA ACA EL PROFE LO ANULO Y SOLO DEJO LA OTRA LINEA
                 _Items.Update(entity);
             }
             _ctx.SaveChanges();

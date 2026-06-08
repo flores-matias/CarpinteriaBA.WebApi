@@ -1,36 +1,39 @@
 ﻿using AutoMapper;
 using CarpinteriaBA.Application;
 using CarpinteriaBA.Application.DTOs.Cliente;
+using CarpinteriaBA.Application.DTOs.Insumo;
 using CarpinteriaBA.Entities;
 using CarpinteriaBA.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarpinteriaBA.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ClientesController:ControllerBase
+    public class InsumosController : ControllerBase
     {
-        private readonly ILogger<ClientesController> _logger;
+        private readonly ILogger<InsumosController> _logger;
         private readonly IStringService _stringService;
-        private readonly IApplication<Cliente> _cliente;
+        private readonly IApplication<Insumo> _insumo;
         private readonly IMapper _mapper;
 
-        public ClientesController(ILogger<ClientesController> logger, 
-            IStringService stringService, 
-            IApplication<Cliente> cliente,
+        public InsumosController(ILogger<InsumosController> logger,
+            IStringService stringService,
+            IApplication<Insumo> insumo,
             IMapper mapper)
         {
             _logger = logger;
             _stringService = stringService;
-            _cliente = cliente;
+            _insumo = insumo;
             _mapper = mapper;
         }
+
         [HttpGet]
         [Route("All")]
         public async Task<IActionResult> All()
         {
-            return Ok(_mapper.Map<IList<ClienteResponseDto>>(_cliente.GetAll()));
+            return Ok(_mapper.Map<IList<InsumoResponseDto>>(_insumo.GetAll()));
         }
 
         [HttpGet]
@@ -41,26 +44,26 @@ namespace CarpinteriaBA.WebApi.Controllers
             {
                 return BadRequest();
             }
-            Cliente cliente = _cliente.GetById(Id.Value);
-            if (cliente is null)
+            Insumo insumo = _insumo.GetById(Id.Value);
+            if (insumo is null)
             {
                 return NotFound();
             }
-            return Ok(_mapper.Map<ClienteResponseDto>(cliente));
+            return Ok(_mapper.Map<InsumoResponseDto>(insumo));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Crear(ClienteRequestDto clienteRequestDto)
+        public async Task<IActionResult> Crear(InsumoRequestDto insumoRequestDto)
         {
             if (!ModelState.IsValid)
             { return BadRequest(); }
-            var cliente = _mapper.Map<Cliente>(clienteRequestDto);
-            _cliente.Save(cliente);
-            return Ok(cliente.Id);
+            var insumo = _mapper.Map<Insumo>(insumoRequestDto);
+            _insumo.Save(insumo);
+            return Ok(insumo.Id);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Editar(int? Id, ClienteRequestDto clienteRequestDto)
+        public async Task<IActionResult> Editar(int? Id, InsumoRequestDto insumoRequestDto)
         {
             if (!Id.HasValue)
             { return BadRequest(); }
@@ -68,14 +71,14 @@ namespace CarpinteriaBA.WebApi.Controllers
             if (!ModelState.IsValid)
             { return BadRequest(); }
 
-            Cliente clienteBack = _cliente.GetById(Id.Value);
+            Insumo insumoBack = _insumo.GetById(Id.Value);
 
-            if (clienteBack is null)
+            if (insumoBack is null)
             { return NotFound(); }
 
-            _mapper.Map(clienteRequestDto, clienteBack);
+            _mapper.Map(insumoRequestDto, insumoBack);
 
-            _cliente.Save(clienteBack);
+            _insumo.Save(insumoBack);
 
             return Ok();
         }
@@ -85,10 +88,10 @@ namespace CarpinteriaBA.WebApi.Controllers
         {
             if (!Id.HasValue)
             { return BadRequest(); }
-            Cliente clienteBack = _cliente.GetById(Id.Value);
-            if (clienteBack is null)
+            Insumo insumoBack = _insumo.GetById(Id.Value);
+            if (insumoBack is null)
             { return NotFound(); }
-            _cliente.Delete(clienteBack.Id);
+            _insumo.Delete(insumoBack.Id);
             return Ok();
         }
     }

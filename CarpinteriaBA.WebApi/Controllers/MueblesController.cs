@@ -1,36 +1,39 @@
 ﻿using AutoMapper;
 using CarpinteriaBA.Application;
 using CarpinteriaBA.Application.DTOs.Cliente;
+using CarpinteriaBA.Application.DTOs.Mueble;
 using CarpinteriaBA.Entities;
 using CarpinteriaBA.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarpinteriaBA.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ClientesController:ControllerBase
+    public class MueblesController : ControllerBase
     {
-        private readonly ILogger<ClientesController> _logger;
+        private readonly ILogger<MueblesController> _logger;
         private readonly IStringService _stringService;
-        private readonly IApplication<Cliente> _cliente;
+        private readonly IApplication<Mueble> _mueble;
         private readonly IMapper _mapper;
 
-        public ClientesController(ILogger<ClientesController> logger, 
-            IStringService stringService, 
-            IApplication<Cliente> cliente,
+        public MueblesController(ILogger<MueblesController> logger,
+            IStringService stringService,
+            IApplication<Mueble> mueble,
             IMapper mapper)
         {
             _logger = logger;
             _stringService = stringService;
-            _cliente = cliente;
+            _mueble = mueble;
             _mapper = mapper;
         }
+
         [HttpGet]
         [Route("All")]
         public async Task<IActionResult> All()
         {
-            return Ok(_mapper.Map<IList<ClienteResponseDto>>(_cliente.GetAll()));
+            return Ok(_mapper.Map<IList<MuebleResponseDto>>(_mueble.GetAll()));
         }
 
         [HttpGet]
@@ -41,26 +44,26 @@ namespace CarpinteriaBA.WebApi.Controllers
             {
                 return BadRequest();
             }
-            Cliente cliente = _cliente.GetById(Id.Value);
-            if (cliente is null)
+            Mueble mueble = _mueble.GetById(Id.Value);
+            if (mueble is null)
             {
                 return NotFound();
             }
-            return Ok(_mapper.Map<ClienteResponseDto>(cliente));
+            return Ok(_mapper.Map<MuebleResponseDto>(mueble));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Crear(ClienteRequestDto clienteRequestDto)
+        public async Task<IActionResult> Crear(MuebleRequestDto muebleRequestDto)
         {
             if (!ModelState.IsValid)
             { return BadRequest(); }
-            var cliente = _mapper.Map<Cliente>(clienteRequestDto);
-            _cliente.Save(cliente);
-            return Ok(cliente.Id);
+            var mueble = _mapper.Map<Mueble>(muebleRequestDto);
+            _mueble.Save(mueble);
+            return Ok(mueble.Id);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Editar(int? Id, ClienteRequestDto clienteRequestDto)
+        public async Task<IActionResult> Editar(int? Id, MuebleRequestDto muebleRequestDto)
         {
             if (!Id.HasValue)
             { return BadRequest(); }
@@ -68,14 +71,14 @@ namespace CarpinteriaBA.WebApi.Controllers
             if (!ModelState.IsValid)
             { return BadRequest(); }
 
-            Cliente clienteBack = _cliente.GetById(Id.Value);
+            Mueble muebleBack = _mueble.GetById(Id.Value);
 
-            if (clienteBack is null)
+            if (muebleBack is null)
             { return NotFound(); }
 
-            _mapper.Map(clienteRequestDto, clienteBack);
+            _mapper.Map(muebleRequestDto, muebleBack);
 
-            _cliente.Save(clienteBack);
+            _mueble.Save(muebleBack);
 
             return Ok();
         }
@@ -85,10 +88,10 @@ namespace CarpinteriaBA.WebApi.Controllers
         {
             if (!Id.HasValue)
             { return BadRequest(); }
-            Cliente clienteBack = _cliente.GetById(Id.Value);
-            if (clienteBack is null)
+            Mueble muebleBack = _mueble.GetById(Id.Value);
+            if (muebleBack is null)
             { return NotFound(); }
-            _cliente.Delete(clienteBack.Id);
+            _mueble.Delete(muebleBack.Id);
             return Ok();
         }
     }

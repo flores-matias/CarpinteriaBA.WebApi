@@ -1,36 +1,38 @@
 ﻿using AutoMapper;
 using CarpinteriaBA.Application;
 using CarpinteriaBA.Application.DTOs.Cliente;
+using CarpinteriaBA.Application.DTOs.Proveedor;
 using CarpinteriaBA.Entities;
 using CarpinteriaBA.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarpinteriaBA.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ClientesController:ControllerBase
+    public class ProveedoresController : ControllerBase
     {
-        private readonly ILogger<ClientesController> _logger;
+        private readonly ILogger<ProveedoresController> _logger;
         private readonly IStringService _stringService;
-        private readonly IApplication<Cliente> _cliente;
+        private readonly IApplication<Proveedor> _proveedor;
         private readonly IMapper _mapper;
 
-        public ClientesController(ILogger<ClientesController> logger, 
-            IStringService stringService, 
-            IApplication<Cliente> cliente,
+        public ProveedoresController(ILogger<ProveedoresController> logger,
+            IStringService stringService,
+            IApplication<Proveedor> proveedor,
             IMapper mapper)
         {
             _logger = logger;
             _stringService = stringService;
-            _cliente = cliente;
+            _proveedor = proveedor;
             _mapper = mapper;
         }
         [HttpGet]
         [Route("All")]
         public async Task<IActionResult> All()
         {
-            return Ok(_mapper.Map<IList<ClienteResponseDto>>(_cliente.GetAll()));
+            return Ok(_mapper.Map<IList<ProveedorResponseDto>>(_proveedor.GetAll()));
         }
 
         [HttpGet]
@@ -41,26 +43,26 @@ namespace CarpinteriaBA.WebApi.Controllers
             {
                 return BadRequest();
             }
-            Cliente cliente = _cliente.GetById(Id.Value);
-            if (cliente is null)
+            Proveedor proveedor = _proveedor.GetById(Id.Value);
+            if (proveedor is null)
             {
                 return NotFound();
             }
-            return Ok(_mapper.Map<ClienteResponseDto>(cliente));
+            return Ok(_mapper.Map<ProveedorResponseDto>(proveedor));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Crear(ClienteRequestDto clienteRequestDto)
+        public async Task<IActionResult> Crear(ProveedorRequestDto proveedorRequestDto)
         {
             if (!ModelState.IsValid)
             { return BadRequest(); }
-            var cliente = _mapper.Map<Cliente>(clienteRequestDto);
-            _cliente.Save(cliente);
-            return Ok(cliente.Id);
+            var proveedor = _mapper.Map<Proveedor>(proveedorRequestDto);
+            _proveedor.Save(proveedor);
+            return Ok(proveedor.Id);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Editar(int? Id, ClienteRequestDto clienteRequestDto)
+        public async Task<IActionResult> Editar(int? Id, ProveedorRequestDto proveedorRequestDto)
         {
             if (!Id.HasValue)
             { return BadRequest(); }
@@ -68,14 +70,14 @@ namespace CarpinteriaBA.WebApi.Controllers
             if (!ModelState.IsValid)
             { return BadRequest(); }
 
-            Cliente clienteBack = _cliente.GetById(Id.Value);
+            Proveedor proveedorBack = _proveedor.GetById(Id.Value);
 
-            if (clienteBack is null)
+            if (proveedorBack is null)
             { return NotFound(); }
 
-            _mapper.Map(clienteRequestDto, clienteBack);
+            _mapper.Map(proveedorRequestDto, proveedorBack);
 
-            _cliente.Save(clienteBack);
+            _proveedor.Save(proveedorBack);
 
             return Ok();
         }
@@ -85,10 +87,10 @@ namespace CarpinteriaBA.WebApi.Controllers
         {
             if (!Id.HasValue)
             { return BadRequest(); }
-            Cliente clienteBack = _cliente.GetById(Id.Value);
-            if (clienteBack is null)
+            Proveedor proveedorBack = _proveedor.GetById(Id.Value);
+            if (proveedorBack is null)
             { return NotFound(); }
-            _cliente.Delete(clienteBack.Id);
+            _proveedor.Delete(proveedorBack.Id);
             return Ok();
         }
     }

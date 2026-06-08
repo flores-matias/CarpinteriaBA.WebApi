@@ -1,36 +1,38 @@
 ﻿using AutoMapper;
 using CarpinteriaBA.Application;
 using CarpinteriaBA.Application.DTOs.Cliente;
+using CarpinteriaBA.Application.DTOs.Pedido;
 using CarpinteriaBA.Entities;
 using CarpinteriaBA.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarpinteriaBA.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ClientesController:ControllerBase
+    public class PedidosController : ControllerBase
     {
-        private readonly ILogger<ClientesController> _logger;
+        private readonly ILogger<PedidosController> _logger;
         private readonly IStringService _stringService;
-        private readonly IApplication<Cliente> _cliente;
+        private readonly IApplication<Pedido> _pedido;
         private readonly IMapper _mapper;
 
-        public ClientesController(ILogger<ClientesController> logger, 
-            IStringService stringService, 
-            IApplication<Cliente> cliente,
+        public PedidosController(ILogger<PedidosController> logger,
+            IStringService stringService,
+            IApplication<Pedido> pedido,
             IMapper mapper)
         {
             _logger = logger;
             _stringService = stringService;
-            _cliente = cliente;
+            _pedido = pedido;
             _mapper = mapper;
         }
         [HttpGet]
         [Route("All")]
         public async Task<IActionResult> All()
         {
-            return Ok(_mapper.Map<IList<ClienteResponseDto>>(_cliente.GetAll()));
+            return Ok(_mapper.Map<IList<PedidoResponseDto>>(_pedido.GetAll()));
         }
 
         [HttpGet]
@@ -41,26 +43,26 @@ namespace CarpinteriaBA.WebApi.Controllers
             {
                 return BadRequest();
             }
-            Cliente cliente = _cliente.GetById(Id.Value);
-            if (cliente is null)
+            Pedido pedido = _pedido.GetById(Id.Value);
+            if (pedido is null)
             {
                 return NotFound();
             }
-            return Ok(_mapper.Map<ClienteResponseDto>(cliente));
+            return Ok(_mapper.Map<PedidoResponseDto>(pedido));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Crear(ClienteRequestDto clienteRequestDto)
+        public async Task<IActionResult> Crear(PedidoRequestDto pedidoRequestDto)
         {
             if (!ModelState.IsValid)
             { return BadRequest(); }
-            var cliente = _mapper.Map<Cliente>(clienteRequestDto);
-            _cliente.Save(cliente);
-            return Ok(cliente.Id);
+            var pedido = _mapper.Map<Pedido>(pedidoRequestDto);
+            _pedido.Save(pedido);
+            return Ok(pedido.Id);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Editar(int? Id, ClienteRequestDto clienteRequestDto)
+        public async Task<IActionResult> Editar(int? Id, PedidoRequestDto pedidoRequestDto)
         {
             if (!Id.HasValue)
             { return BadRequest(); }
@@ -68,14 +70,14 @@ namespace CarpinteriaBA.WebApi.Controllers
             if (!ModelState.IsValid)
             { return BadRequest(); }
 
-            Cliente clienteBack = _cliente.GetById(Id.Value);
+            Pedido pedidoBack = _pedido.GetById(Id.Value);
 
-            if (clienteBack is null)
+            if (pedidoBack is null)
             { return NotFound(); }
 
-            _mapper.Map(clienteRequestDto, clienteBack);
+            _mapper.Map(pedidoRequestDto, pedidoBack);
 
-            _cliente.Save(clienteBack);
+            _pedido.Save(pedidoBack);
 
             return Ok();
         }
@@ -85,10 +87,10 @@ namespace CarpinteriaBA.WebApi.Controllers
         {
             if (!Id.HasValue)
             { return BadRequest(); }
-            Cliente clienteBack = _cliente.GetById(Id.Value);
-            if (clienteBack is null)
+            Pedido pedidoBack = _pedido.GetById(Id.Value);
+            if (pedidoBack is null)
             { return NotFound(); }
-            _cliente.Delete(clienteBack.Id);
+            _pedido.Delete(pedidoBack.Id);
             return Ok();
         }
     }

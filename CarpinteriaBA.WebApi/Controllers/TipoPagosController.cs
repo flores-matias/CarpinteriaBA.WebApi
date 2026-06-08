@@ -1,36 +1,38 @@
 ﻿using AutoMapper;
 using CarpinteriaBA.Application;
 using CarpinteriaBA.Application.DTOs.Cliente;
+using CarpinteriaBA.Application.DTOs.TipoDePago;
 using CarpinteriaBA.Entities;
 using CarpinteriaBA.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarpinteriaBA.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ClientesController:ControllerBase
+    public class TipoPagosController : ControllerBase
     {
-        private readonly ILogger<ClientesController> _logger;
+        private readonly ILogger<TipoPagosController> _logger;
         private readonly IStringService _stringService;
-        private readonly IApplication<Cliente> _cliente;
+        private readonly IApplication<TipoPago> _tipoPago;
         private readonly IMapper _mapper;
 
-        public ClientesController(ILogger<ClientesController> logger, 
-            IStringService stringService, 
-            IApplication<Cliente> cliente,
+        public TipoPagosController(ILogger<TipoPagosController> logger,
+            IStringService stringService,
+            IApplication<TipoPago> tipoPago,
             IMapper mapper)
         {
             _logger = logger;
             _stringService = stringService;
-            _cliente = cliente;
+            _tipoPago = tipoPago;
             _mapper = mapper;
         }
         [HttpGet]
         [Route("All")]
         public async Task<IActionResult> All()
         {
-            return Ok(_mapper.Map<IList<ClienteResponseDto>>(_cliente.GetAll()));
+            return Ok(_mapper.Map<IList<TipoPagoResponseDto>>(_tipoPago.GetAll()));
         }
 
         [HttpGet]
@@ -41,26 +43,26 @@ namespace CarpinteriaBA.WebApi.Controllers
             {
                 return BadRequest();
             }
-            Cliente cliente = _cliente.GetById(Id.Value);
-            if (cliente is null)
+            TipoPago tipoPago = _tipoPago.GetById(Id.Value);
+            if (tipoPago is null)
             {
                 return NotFound();
             }
-            return Ok(_mapper.Map<ClienteResponseDto>(cliente));
+            return Ok(_mapper.Map<TipoPagoResponseDto>(tipoPago));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Crear(ClienteRequestDto clienteRequestDto)
+        public async Task<IActionResult> Crear(TipoPagoRequestDto tipoPagoRequestDto)
         {
             if (!ModelState.IsValid)
             { return BadRequest(); }
-            var cliente = _mapper.Map<Cliente>(clienteRequestDto);
-            _cliente.Save(cliente);
-            return Ok(cliente.Id);
+            var tipoPago = _mapper.Map<TipoPago>(tipoPagoRequestDto);
+            _tipoPago.Save(tipoPago);
+            return Ok(tipoPago.Id);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Editar(int? Id, ClienteRequestDto clienteRequestDto)
+        public async Task<IActionResult> Editar(int? Id, TipoPagoRequestDto tipoPagoRequestDto)
         {
             if (!Id.HasValue)
             { return BadRequest(); }
@@ -68,14 +70,14 @@ namespace CarpinteriaBA.WebApi.Controllers
             if (!ModelState.IsValid)
             { return BadRequest(); }
 
-            Cliente clienteBack = _cliente.GetById(Id.Value);
+            TipoPago tipoPagoBack = _tipoPago.GetById(Id.Value);
 
-            if (clienteBack is null)
+            if (tipoPagoBack is null)
             { return NotFound(); }
 
-            _mapper.Map(clienteRequestDto, clienteBack);
+            _mapper.Map(tipoPagoRequestDto, tipoPagoBack);
 
-            _cliente.Save(clienteBack);
+            _tipoPago.Save(tipoPagoBack);
 
             return Ok();
         }
@@ -85,10 +87,10 @@ namespace CarpinteriaBA.WebApi.Controllers
         {
             if (!Id.HasValue)
             { return BadRequest(); }
-            Cliente clienteBack = _cliente.GetById(Id.Value);
-            if (clienteBack is null)
+            TipoPago tipoPagoBack = _tipoPago.GetById(Id.Value);
+            if (tipoPagoBack is null)
             { return NotFound(); }
-            _cliente.Delete(clienteBack.Id);
+            _tipoPago.Delete(tipoPagoBack.Id);
             return Ok();
         }
     }
