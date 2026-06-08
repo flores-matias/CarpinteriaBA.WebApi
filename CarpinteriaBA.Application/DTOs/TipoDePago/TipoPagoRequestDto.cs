@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace CarpinteriaBA.Application.DTOs.Mueble
+namespace CarpinteriaBA.Application.DTOs.TipoDePago
 {
-    public class MuebleRequestDto
+    public class TipoPagoRequestDto
     {
         
-        [StringLength(30)]
-        public string Nombre { get; set; } = null!;
         [StringLength(200)]
         public string Descripcion { get; set; } = null!;
-        public decimal PrecioSugerido { get; set; }
     }
 }

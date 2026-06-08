@@ -5,11 +5,11 @@ using System.Text;
 
 namespace CarpinteriaBA.Application.DTOs.Configuracion
 {
-    public class ConfiguracionResponseDto
+    public class ConfiguracionRequestDto
     {
-        public int Id { get; set; }
         public string Clave { get; set; } = null!;
         public decimal Valor { get; set; }
+        [StringLength(200)]
         public string Descripcion { get; set; } = null!;
     }
 }
