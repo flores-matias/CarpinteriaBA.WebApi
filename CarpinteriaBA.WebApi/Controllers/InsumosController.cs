@@ -58,11 +58,15 @@ namespace CarpinteriaBA.WebApi.Controllers
             if (!ModelState.IsValid)
             { return BadRequest(); }
             var insumo = _mapper.Map<Insumo>(insumoRequestDto);
+            //
+            insumo.ActualizarPrecioCosto(insumoRequestDto.PrecioCostoActual);//Para que se registre el precio costo actual en la creación del insumo
+            //
             _insumo.Save(insumo);
             return Ok(insumo.Id);
         }
 
         [HttpPut]
+        //para cambiar el precio solo y no lo demas se usa el PATCH
         public async Task<IActionResult> Editar(int? Id, InsumoRequestDto insumoRequestDto)
         {
             if (!Id.HasValue)
@@ -80,6 +84,19 @@ namespace CarpinteriaBA.WebApi.Controllers
 
             _insumo.Save(insumoBack);
 
+            return Ok();
+        }
+
+        [HttpPatch]
+        public async Task<IActionResult> EditarPrecioCosto(int? Id, decimal precioCostoActual)
+        {
+            if (!Id.HasValue)
+            { return BadRequest(); }
+            Insumo insumoBack = _insumo.GetById(Id.Value);
+            if (insumoBack is null)
+            { return NotFound(); }
+            insumoBack.ActualizarPrecioCosto(precioCostoActual);
+            _insumo.Save(insumoBack);
             return Ok();
         }
 

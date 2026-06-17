@@ -16,7 +16,8 @@ namespace CarpinteriaBA.Entities
         }
         public int Id { get; set; }
         [ForeignKey(nameof(Cliente))]
-        public int IdCliente { get; set; }
+        public int IdCliente { get;  set; }
+        //public virtual string NombreCliente { get; set; }
         public virtual Cliente Cliente { get; set; }
         public DateTime FechaCreacion { get; set; }
         public DateTime FechaEntregaPrometida { get; set; }

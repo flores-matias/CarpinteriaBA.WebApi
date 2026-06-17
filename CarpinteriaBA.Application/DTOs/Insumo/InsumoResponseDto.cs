@@ -13,6 +13,7 @@ namespace CarpinteriaBA.Application.DTOs.Insumo
         public decimal StockActual { get; set; }
         public string UnidadMedida { get; set; } = null!;
         public decimal PrecioCostoActual { get; set; }
+        
         public int IdProveedor { get; set; }
     }
 }

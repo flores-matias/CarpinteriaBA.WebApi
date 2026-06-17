@@ -8,7 +8,8 @@ namespace CarpinteriaBA.WebApi.Mapping
     {
         public PedidoMappingProfile()
         {
-            CreateMap<Pedido, PedidoResponseDto>();
+            CreateMap<Pedido, PedidoResponseDto>()
+                .ForMember(dest => dest.Cliente, opt => opt.MapFrom(src => src.Cliente.Nombre));
             CreateMap<PedidoRequestDto, Pedido>();
         }
     }

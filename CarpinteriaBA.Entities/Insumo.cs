@@ -19,7 +19,15 @@ namespace CarpinteriaBA.Entities
         public string Nombre { get; set; }
         public decimal StockActual { get; set; }
         public string UnidadMedida { get; set; }
-        public decimal PrecioCostoActual { get; set; }
+        public decimal PrecioCostoActual { get; private set; }
+        public void ActualizarPrecioCosto(decimal nuevoPrecio)
+        {
+            if (nuevoPrecio <= 0)
+            {
+                throw new ArgumentException("El precio de costo debe ser mayor que cero.");
+            }
+            PrecioCostoActual = nuevoPrecio;
+        }
 
         [ForeignKey(nameof(Proveedor))]
         public int IdProveedor { get; set; }
