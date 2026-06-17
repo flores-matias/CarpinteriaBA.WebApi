@@ -8,7 +8,6 @@ namespace CarpinteriaBA.Application.DTOs.Pedido
     public class PedidoResponseDto
     {
         public int Id { get; set; }
-        //public int IdCliente { get; set; }
         public string Cliente { get; set; } = null!;
         public DateTime FechaCreacion { get; set; }
         public DateTime FechaEntregaPrometida { get; set; }
