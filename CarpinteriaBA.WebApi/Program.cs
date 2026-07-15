@@ -59,7 +59,7 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = JwtBearerDefaults.AuthenticationScheme,
         BearerFormat = "JWT"
     });
-
+    //error
     // AddSecurityRequirement ahora recibe un delegado que expone el "document"
     c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
