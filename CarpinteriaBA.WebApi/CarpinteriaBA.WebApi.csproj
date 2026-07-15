@@ -37,8 +37,4 @@
     <ProjectReference Include="..\CarpinteriaBA.Services\CarpinteriaBA.Services.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\Identity\" />
-  </ItemGroup>
-
 </Project>

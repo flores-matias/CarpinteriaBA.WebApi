@@ -18,6 +18,8 @@ namespace CarpinteriaBA.Entities.MicrosoftIdentity
         [PersonalData]
         public string Apellidos { get; set; }
         [StringLength(20)]
-        public string Telefono { get; set; } = null!;
+        //public string Telefono { get; set; } = null!;
+        [DataType(DataType.Date)]
+        public DateTime? FechaNacimiento { get; set; }
     }
 }
