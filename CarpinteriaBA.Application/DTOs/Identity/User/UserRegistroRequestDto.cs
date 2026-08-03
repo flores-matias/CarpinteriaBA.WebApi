@@ -18,5 +18,6 @@ namespace CarpinteriaBA.Application.DTOs.Identity.User
         public string Password { get; set; }
         [DataType(DataType.Date)]
         public DateTime? FechaNacimiento { get; set; }
+
     }
 }
