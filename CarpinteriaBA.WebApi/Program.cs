@@ -65,7 +65,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         {
             new OpenApiSecuritySchemeReference(schemeId, document),
-            Array.Empty<string>()
+            new List<String>()
         }
 
     });
@@ -98,6 +98,14 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true
     };
 });
+
+//builder.Services.AddIdentity<User, Role>(
+//    options => options.SignIn.RequireConfirmedAccount = true).
+//    AddDefaultTokenProviders().
+//    AddEntityFrameworkStores<DbDataAccess>().
+//    AddSignInManager<SignInManager<User>>().
+//    AddRoleManager<RoleManager<Role>>().
+//    AddUserManager<UserManager<User>>();
 
 builder.Services.AddIdentity<User, Role>(
     options => options.SignIn.RequireConfirmedAccount = true).

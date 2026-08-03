@@ -1,4 +1,5 @@
 ﻿using CarpinteriaBA.Entities;
+using CarpinteriaBA.Entities.MicrosoftIdentity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -7,7 +8,7 @@ using System.Text;
 
 namespace CarpinteriaBA.DataAccess
 {
-    public class DbDataAccess:IdentityDbContext
+    public class DbDataAccess : IdentityDbContext<User, Role, Guid, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>
     {
         public virtual DbSet<Insumo> Insumos { get; set; }
         public virtual DbSet<Mueble> Muebles { get; set; }
@@ -28,5 +29,10 @@ namespace CarpinteriaBA.DataAccess
                                                                                                                                                         //ejecutando, esto es muy util para poder debuggear y ver que esta pasando con las consultas a la
                                                                                                                                                         //base de datos, ademas de que me muestre los errores detallados para poder entender mejor que
                                                                                                                                                         //esta pasando cuando algo sale mal.
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
+        }
     }
 }
