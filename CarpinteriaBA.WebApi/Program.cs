@@ -120,6 +120,7 @@ builder.Services.AddScoped(typeof(IStringService), typeof(StringService));
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped(typeof(IApplication<>), typeof(Application<>));
 builder.Services.AddScoped(typeof(IDbContext<>), typeof(DbContext<>));//corregido
+builder.Services.AddScoped(typeof(ITokenHandlerService), typeof(TokenHandlerService));
 
 var app = builder.Build();
 
