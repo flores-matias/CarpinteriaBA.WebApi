@@ -2,6 +2,7 @@
 using CarpinteriaBA.Application;
 using CarpinteriaBA.Application.DTOs.Cliente;
 using CarpinteriaBA.Entities;
+using CarpinteriaBA.Entities.MicrosoftIdentity;
 using CarpinteriaBA.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;

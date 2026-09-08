@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 namespace CarpinteriaBA.WebApi.Controllers
 {
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class DetallePedidosController : ControllerBase

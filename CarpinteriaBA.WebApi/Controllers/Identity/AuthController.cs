@@ -15,11 +15,11 @@ namespace CarpinteriaBA.WebApi.Controllers.Identity
     public class AuthController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
-        private readonly ILogger<ClientesController> _logger;
+        private readonly ILogger<User> _logger;
         private readonly ITokenHandlerService _servicioToken;
         public AuthController(
             UserManager<User> userManager
-            , ILogger<ClientesController> logger
+            , ILogger<User> logger
             , ITokenHandlerService servicioToken)
         {
             _userManager = userManager;

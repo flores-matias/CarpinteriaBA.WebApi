@@ -2,6 +2,7 @@
 using CarpinteriaBA.Application;
 using CarpinteriaBA.Application.DTOs.Configuracion;
 using CarpinteriaBA.Entities;
+using CarpinteriaBA.Entities.MicrosoftIdentity;
 using CarpinteriaBA.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -10,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CarpinteriaBA.WebApi.Controllers
 {
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class ConfiguracionesController : ControllerBase
