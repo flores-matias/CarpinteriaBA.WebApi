@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CarpinteriaBA.DataAccess.MicrosoftIdentity
 {
-    public class UserClamConfiguration : IEntityTypeConfiguration<UserClaim>
+    public class UserClaimConfiguration : IEntityTypeConfiguration<UserClaim>
     {
         public void Configure(EntityTypeBuilder<UserClaim> builder)
         {
