@@ -3,6 +3,7 @@ using CarpinteriaBA.Application.DTOs.Login;
 using CarpinteriaBA.Entities.MicrosoftIdentity;
 using CarpinteriaBA.Services.AuthServices;
 using CarpinteriaBA.WebApi.Configurations;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -27,8 +28,10 @@ namespace CarpinteriaBA.WebApi.Controllers.Identity
             _servicioToken = servicioToken;
         }
 
+        // Solo un usuario con sesion iniciada con el token valido puede registrar usuarios nuevos
         [HttpPost]
         [Route("Register")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> RegistrarUsuario([FromBody] UserRegistroRequestDto user)
         {
             if (ModelState.IsValid)
@@ -36,7 +39,7 @@ namespace CarpinteriaBA.WebApi.Controllers.Identity
                 var existeUsuario = await _userManager.FindByEmailAsync(user.Email);
                 if (existeUsuario != null)
                 {
-                    return BadRequest("Existe un usuario registrado con el mal " + user.Email + ".");
+                    return BadRequest("Existe un usuario registrado con el mail " + user.Email + ".");
                 }
                 var Creado = await _userManager.CreateAsync(new User()
                 {
