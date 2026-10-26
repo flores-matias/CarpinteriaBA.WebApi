@@ -60,10 +60,18 @@ namespace CarpinteriaBA.WebApi.Controllers
         {
             if (!ModelState.IsValid)
             { return BadRequest(); }
+
             var insumo = _mapper.Map<Insumo>(insumoRequestDto);
-            //
-            insumo.ActualizarPrecioCosto(insumoRequestDto.PrecioCostoActual);//Para que se registre el precio costo actual en la creación del insumo
-            //
+            try
+            {
+                // El precio se registra solo a traves del metodo de la entidad, que lo valida
+                insumo.ActualizarPrecioCosto(insumoRequestDto.PrecioCostoActual);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
             _insumo.Save(insumo);
             return Ok(insumo.Id);
         }
@@ -83,7 +91,16 @@ namespace CarpinteriaBA.WebApi.Controllers
             if (insumoBack is null)
             { return NotFound(); }
 
+            // AutoMapper copia todo menos el precio (se ignora en InsumoMappingProfile)
             _mapper.Map(insumoRequestDto, insumoBack);
+            try
+            {
+                insumoBack.ActualizarPrecioCosto(insumoRequestDto.PrecioCostoActual);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
             _insumo.Save(insumoBack);
 
@@ -98,7 +115,14 @@ namespace CarpinteriaBA.WebApi.Controllers
             Insumo insumoBack = _insumo.GetById(Id.Value);
             if (insumoBack is null)
             { return NotFound(); }
-            insumoBack.ActualizarPrecioCosto(precioCostoActual);
+            try
+            {
+                insumoBack.ActualizarPrecioCosto(precioCostoActual);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
             _insumo.Save(insumoBack);
             return Ok();
         }
