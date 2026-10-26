@@ -20,7 +20,7 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
 const string FrontendCorsPolicy = "Frontend";
-var allowedOrigins=builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()??Array.Empty<string>();
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(FrontendCorsPolicy, policy =>
@@ -145,7 +145,8 @@ app.UseHttpsRedirection();
 
 app.UseCors(FrontendCorsPolicy);
 
-
+// Primero se lee el token (autenticacion) y despues se decide si deja pasar (autorizacion)
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
