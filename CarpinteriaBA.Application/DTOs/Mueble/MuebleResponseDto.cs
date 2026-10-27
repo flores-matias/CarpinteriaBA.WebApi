@@ -11,5 +11,9 @@ namespace CarpinteriaBA.Application.DTOs.Mueble
         public string Nombre { get; set; } = null!;
         public string Descripcion { get; set; } = null!;
         public decimal PrecioSugerido { get; set; }
+
+        // Calculados con la receta y los margenes de Configuracion (no se guardan)
+        public decimal CostoMateriales { get; set; }
+        public decimal PrecioCalculado { get; set; }
     }
 }

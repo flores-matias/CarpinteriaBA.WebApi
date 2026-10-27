@@ -3,6 +3,7 @@ using CarpinteriaBA.Application;
 using CarpinteriaBA.Application.DTOs.Configuracion;
 using CarpinteriaBA.Entities;
 using CarpinteriaBA.Entities.MicrosoftIdentity;
+using CarpinteriaBA.Enums;
 using CarpinteriaBA.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -63,6 +64,13 @@ namespace CarpinteriaBA.WebApi.Controllers
             {
                 return BadRequest();
             }
+
+            // No puede haber dos configuraciones con la misma clave
+            if (ExisteClave(configuracionRequestDto.Clave, idExcluido: null))
+            {
+                return BadRequest($"Ya existe una configuracion con la clave \"{configuracionRequestDto.Clave}\".");
+            }
+
             var configuracion = _mapper.Map<Configuracion>(configuracionRequestDto);
             _configuracion.Save(configuracion);
             return Ok(configuracion.Id);
@@ -82,6 +90,18 @@ namespace CarpinteriaBA.WebApi.Controllers
             if (configuracionBack is null)
             { return NotFound(); }
 
+            // Las claves que usa el calculo de precios no se pueden renombrar (el valor si se puede cambiar)
+            if (ClavesConfiguracion.EsProtegida(configuracionBack.Clave)
+                && configuracionRequestDto.Clave != configuracionBack.Clave)
+            {
+                return BadRequest($"La clave \"{configuracionBack.Clave}\" la usa el sistema para calcular precios: se puede cambiar su valor, pero no su nombre.");
+            }
+
+            if (ExisteClave(configuracionRequestDto.Clave, idExcluido: configuracionBack.Id))
+            {
+                return BadRequest($"Ya existe una configuracion con la clave \"{configuracionRequestDto.Clave}\".");
+            }
+
             _mapper.Map(configuracionRequestDto, configuracionBack);
 
             _configuracion.Save(configuracionBack);
@@ -100,8 +120,21 @@ namespace CarpinteriaBA.WebApi.Controllers
             if (configuracionBack is null)
             { return NotFound(); }
 
+            if (ClavesConfiguracion.EsProtegida(configuracionBack.Clave))
+            {
+                return BadRequest($"La clave \"{configuracionBack.Clave}\" la usa el sistema para calcular precios y no se puede eliminar.");
+            }
+
             _configuracion.Delete(configuracionBack.Id);
             return Ok();
+        }
+
+        //True si ya hay otra configuracion con esa clave (sin distinguir mayusculas).</summary>
+        private bool ExisteClave(string clave, int? idExcluido)
+        {
+            return _configuracion.GetAll().Any(c =>
+                c.Id != idExcluido
+                && string.Equals(c.Clave.Trim(), clave.Trim(), StringComparison.OrdinalIgnoreCase));
         }
     }
 }

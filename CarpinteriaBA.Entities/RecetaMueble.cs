@@ -6,7 +6,7 @@ using System.Text;
 
 namespace CarpinteriaBA.Entities
 {
-    public class RecetaMueble:IEntidad
+    public class RecetaMueble : IEntidad
     {
         public int Id { get; set; }
         [ForeignKey(nameof(Mueble))]
@@ -17,5 +17,9 @@ namespace CarpinteriaBA.Entities
         public virtual Insumo Insumo { get; set; } //= null!;
         public decimal CantidadConDesperdicio { get; set; }
 
+        // Costo de este insumo en el mueble: cantidad con desperdicio x precio de costo ACTUAL del insumo.
+        // Calculado: si sube el insumo, sube solo. No se guarda en la base.
+        [NotMapped]
+        public decimal Subtotal => CantidadConDesperdicio * (Insumo?.PrecioCostoActual ?? 0);
     }
 }

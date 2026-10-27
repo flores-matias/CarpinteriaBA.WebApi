@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using CarpinteriaBA.Application;
-using CarpinteriaBA.Application.DTOs.Cliente;
 using CarpinteriaBA.Application.DTOs.RecetaMueble;
 using CarpinteriaBA.Entities;
 using CarpinteriaBA.Services;
@@ -19,18 +18,22 @@ namespace CarpinteriaBA.WebApi.Controllers
         private readonly ILogger<RecetaMueblesController> _logger;
         private readonly IStringService _stringService;
         private readonly IApplication<RecetaMueble> _recetaMueble;
+        private readonly IApplication<Mueble> _mueble;
         private readonly IMapper _mapper;
 
         public RecetaMueblesController(ILogger<RecetaMueblesController> logger,
             IStringService stringService,
             IApplication<RecetaMueble> recetaMueble,
+            IApplication<Mueble> mueble,
             IMapper mapper)
         {
             _logger = logger;
             _stringService = stringService;
             _recetaMueble = recetaMueble;
+            _mueble = mueble;
             _mapper = mapper;
         }
+
         [HttpGet]
         [Route("All")]
         public async Task<IActionResult> All()
@@ -54,11 +57,37 @@ namespace CarpinteriaBA.WebApi.Controllers
             return Ok(_mapper.Map<RecetaMuebleResponseDto>(recetaMueble));
         }
 
+        /// <summary>GET api/RecetaMuebles/ByMueble?IdMueble=... La receta (insumos) de un mueble.</summary>
+        [HttpGet]
+        [Route("ByMueble")]
+        public async Task<IActionResult> ByMueble(int? IdMueble)
+        {
+            if (!IdMueble.HasValue)
+            {
+                return BadRequest();
+            }
+            Mueble mueble = _mueble.GetById(IdMueble.Value);
+            if (mueble is null)
+            {
+                return NotFound();
+            }
+            // Con lazy loading, EF trae solo la receta de este mueble
+            return Ok(_mapper.Map<IList<RecetaMuebleResponseDto>>(mueble.RecetasMuebles.ToList()));
+        }
+
         [HttpPost]
         public async Task<IActionResult> Crear(RecetaMuebleRequestDto recetaMuebleRequestDto)
         {
             if (!ModelState.IsValid)
             { return BadRequest(); }
+
+            Mueble mueble = _mueble.GetById(recetaMuebleRequestDto.IdMueble);
+            if (mueble is null)
+            { return BadRequest("El mueble no existe."); }
+
+            if (mueble.RecetasMuebles.Any(r => r.IdInsumo == recetaMuebleRequestDto.IdInsumo))
+            { return BadRequest("Ese insumo ya esta en la receta. Edita la cantidad en lugar de agregarlo de nuevo."); }
+
             var recetaMueble = _mapper.Map<RecetaMueble>(recetaMuebleRequestDto);
             _recetaMueble.Save(recetaMueble);
             return Ok(recetaMueble.Id);
@@ -78,8 +107,18 @@ namespace CarpinteriaBA.WebApi.Controllers
             if (recetaMuebleBack is null)
             { return NotFound(); }
 
-            _mapper.Map(recetaMuebleRequestDto, recetaMuebleBack);
+            // Un renglon de receta no se mueve a otro mueble
+            if (recetaMuebleRequestDto.IdMueble != recetaMuebleBack.IdMueble)
+            { return BadRequest("No se puede cambiar el mueble de una receta."); }
 
+            Mueble mueble = _mueble.GetById(recetaMuebleBack.IdMueble);
+
+            // Si cambio el insumo, que no sea uno que ya esta en otro renglon de la receta
+            if (mueble.RecetasMuebles.Any(r => r.IdInsumo == recetaMuebleRequestDto.IdInsumo
+                                            && r.Id != recetaMuebleBack.Id))
+            { return BadRequest("Ese insumo ya esta en la receta."); }
+
+            _mapper.Map(recetaMuebleRequestDto, recetaMuebleBack);
             _recetaMueble.Save(recetaMuebleBack);
 
             return Ok();
