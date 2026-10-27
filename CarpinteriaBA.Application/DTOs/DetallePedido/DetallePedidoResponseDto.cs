@@ -9,8 +9,13 @@ namespace CarpinteriaBA.Application.DTOs.DetallePedido
     {
         public int Id { get; set; }
         public int IdPedido { get; set; }
+
         public int IdMueble { get; set; }
+        // Nombre del mueble, para mostrar en la tabla
+        public string Mueble { get; set; } = null!;
+
         public int Cantidad { get; set; }
         public decimal PrecioVentaReal { get; set; }
+        public decimal Subtotal { get; set; }
     }
 }

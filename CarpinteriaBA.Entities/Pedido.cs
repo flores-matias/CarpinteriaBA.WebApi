@@ -30,26 +30,44 @@ namespace CarpinteriaBA.Entities
         public virtual ICollection<Pago> Pagos { get; set; }
 
         // ---- Calculados: no se guardan en la base ----
-        //Suma de todos los pagos del pedido (ej: seña + saldo)
+
+        //Suma de todos los pagos del pedido (ej: seña + saldo).
         [NotMapped]
         public decimal TotalPagado => Pagos.Sum(p => p.Monto);
 
-        //Lo que falta pagar
+        //Lo que falta pagar.
         [NotMapped]
         public decimal Saldo => TotalAPagar - TotalPagado;
 
+        //Suma de los subtotales de los detalles cargados actualmente.
+        [NotMapped]
+        public decimal TotalDetalles => DetallesPedidos.Sum(d => d.Subtotal);
+
+        //Entregado o Cancelado: ya no se le pueden cambiar los muebles.
+        [NotMapped]
+        public bool EstaCerrado =>
+            EstadoPedido == EstadosPedido.Entregado || EstadoPedido == EstadosPedido.Cancelado;
+
         // ---- Reglas del negocio ----
-        /// Recalcula el total como la suma de los detalles (cantidad x precio de venta)
-        /// y actualiza el estado de pago. Se llama cada vez que se agrega, edita o borra un detalle.
-        public void RecalcularTotalAPagar()
+
+        //Fija el nuevo total del pedido (suma de sus detalles) y actualiza el estado de pago.
+        //El total no puede quedar por debajo de lo que ya se pago.
+        //Se llama cada vez que se agrega, edita o quita un detalle.
+        public void ActualizarTotalAPagar(decimal nuevoTotal)
         {
-            TotalAPagar = DetallesPedidos.Sum(d => d.Cantidad * d.PrecioVentaReal);
+            if (nuevoTotal < TotalPagado)
+            {
+                throw new ArgumentException(
+                    $"El total del pedido (${nuevoTotal:N2}) no puede quedar por debajo de lo ya pagado (${TotalPagado:N2}).");
+            }
+            TotalAPagar = nuevoTotal;
             ActualizarEstadoPago();
         }
 
-        
+        /// <summary>
         /// Pendiente: no se pago nada. Parcial: se pago una parte. Pagado: se cubrio el total.
         /// Se llama cada vez que se agrega, edita o borra un pago.
+        /// </summary>
         public void ActualizarEstadoPago()
         {
             decimal pagado = TotalPagado;
