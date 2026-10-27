@@ -6,9 +6,9 @@ using System.Text;
 
 namespace CarpinteriaBA.Entities
 {
-    public class DetallePedido:IEntidad
+    public class DetallePedido : IEntidad
     {
-        public int Id{ get; set; }
+        public int Id { get; set; }
         [ForeignKey(nameof(Pedido))]
         public int IdPedido { get; set; }
         public virtual Pedido Pedido { get; set; }//= null!;
@@ -17,5 +17,9 @@ namespace CarpinteriaBA.Entities
         public virtual Mueble Mueble { get; set; }//= null!;
         public int Cantidad { get; set; }
         public decimal PrecioVentaReal { get; set; }
+
+        //Cantidad x precio de venta. Calculado: no se guarda en la base.
+        [NotMapped]
+        public decimal Subtotal => Cantidad * PrecioVentaReal;
     }
 }

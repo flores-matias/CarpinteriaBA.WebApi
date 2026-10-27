@@ -3,6 +3,7 @@ using CarpinteriaBA.Application;
 using CarpinteriaBA.Application.DTOs.Cliente;
 using CarpinteriaBA.Application.DTOs.Pago;
 using CarpinteriaBA.Entities;
+using CarpinteriaBA.Enums;
 using CarpinteriaBA.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -19,16 +20,19 @@ namespace CarpinteriaBA.WebApi.Controllers
         private readonly ILogger<PagosController> _logger;
         private readonly IStringService _stringService;
         private readonly IApplication<Pago> _pago;
+        private readonly IApplication<Pedido> _pedido;
         private readonly IMapper _mapper;
 
         public PagosController(ILogger<PagosController> logger,
             IStringService stringService,
             IApplication<Pago> pago,
+            IApplication<Pedido> pedido,
             IMapper mapper)
         {
             _logger = logger;
             _stringService = stringService;
             _pago = pago;
+            _pedido = pedido;
             _mapper = mapper;
         }
 
@@ -60,8 +64,23 @@ namespace CarpinteriaBA.WebApi.Controllers
         {
             if (!ModelState.IsValid)
             { return BadRequest(); }
+
+            Pedido pedido = _pedido.GetById(pagoRequestDto.IdPedido);
+            if (pedido is null)
+            { return BadRequest("El pedido no existe."); }
+
+            // Validaciones del negocio (el monto disponible es todo el saldo del pedido)
+            string? error = ValidarPago(pedido, pagoRequestDto, pedido.Saldo);
+            if (error is not null)
+            { return BadRequest(error); }
+
             var pago = _mapper.Map<Pago>(pagoRequestDto);
             _pago.Save(pago);
+
+            // El pago nuevo ya cuenta en pedido.Pagos: se recalcula Pendiente / Parcial / Pagado
+            pedido.ActualizarEstadoPago();
+            _pedido.Save(pedido);
+
             return Ok(pago.Id);
         }
 
@@ -79,9 +98,23 @@ namespace CarpinteriaBA.WebApi.Controllers
             if (pagoBack is null)
             { return NotFound(); }
 
-            _mapper.Map(pagoRequestDto, pagoBack);
+            // Un pago no se mueve de pedido: si se cargo en el pedido equivocado, se borra y se carga de nuevo
+            if (pagoRequestDto.IdPedido != pagoBack.IdPedido)
+            { return BadRequest("No se puede cambiar el pedido de un pago. Eliminalo y cargalo en el pedido correcto."); }
 
+            Pedido pedido = _pedido.GetById(pagoBack.IdPedido);
+
+            // Al editar, el monto anterior de este pago "vuelve" al saldo disponible
+            decimal disponible = pedido.Saldo + pagoBack.Monto;
+            string? error = ValidarPago(pedido, pagoRequestDto, disponible);
+            if (error is not null)
+            { return BadRequest(error); }
+
+            _mapper.Map(pagoRequestDto, pagoBack);
             _pago.Save(pagoBack);
+
+            pedido.ActualizarEstadoPago();
+            _pedido.Save(pedido);
 
             return Ok();
         }
@@ -94,8 +127,43 @@ namespace CarpinteriaBA.WebApi.Controllers
             Pago pagoBack = _pago.GetById(Id.Value);
             if (pagoBack is null)
             { return NotFound(); }
+
+            int idPedido = pagoBack.IdPedido;
             _pago.Delete(pagoBack.Id);
+
+            // Sin este pago, el pedido puede volver a Parcial o Pendiente
+            Pedido pedido = _pedido.GetById(idPedido);
+            if (pedido is not null)
+            {
+                pedido.ActualizarEstadoPago();
+                _pedido.Save(pedido);
+            }
+
             return Ok();
+        }
+
+        /// <summary>
+        /// Reglas comunes de alta y edicion. Devuelve el mensaje de error, o null si el pago es valido.
+        /// </summary>
+        private static string? ValidarPago(Pedido pedido, PagoRequestDto pago, decimal disponible)
+        {
+            if (pedido.EstadoPedido == EstadosPedido.Cancelado)
+            {
+                return "No se pueden registrar pagos en un pedido cancelado.";
+            }
+            if (pago.FechaPago.Date > DateTime.Today)
+            {
+                return "La fecha de pago no puede ser posterior a hoy.";
+            }
+            if (disponible <= 0)
+            {
+                return "El pedido no tiene saldo pendiente.";
+            }
+            if (pago.Monto > disponible)
+            {
+                return $"El monto supera el saldo del pedido (${disponible:N2}).";
+            }
+            return null;
         }
     }
 }
