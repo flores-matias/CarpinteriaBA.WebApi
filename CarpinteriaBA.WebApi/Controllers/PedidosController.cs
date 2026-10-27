@@ -3,6 +3,7 @@ using CarpinteriaBA.Application;
 using CarpinteriaBA.Application.DTOs.Cliente;
 using CarpinteriaBA.Application.DTOs.Pedido;
 using CarpinteriaBA.Entities;
+using CarpinteriaBA.Enums;
 using CarpinteriaBA.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -31,6 +32,7 @@ namespace CarpinteriaBA.WebApi.Controllers
             _pedido = pedido;
             _mapper = mapper;
         }
+
         [HttpGet]
         [Route("All")]
         public async Task<IActionResult> All()
@@ -54,12 +56,33 @@ namespace CarpinteriaBA.WebApi.Controllers
             return Ok(_mapper.Map<PedidoResponseDto>(pedido));
         }
 
+        /// <summary>Lista de estados validos, para que el front arme el select sin repetirlos.</summary>
+        [HttpGet]
+        [Route("Estados")]
+        public IActionResult Estados()
+        {
+            return Ok(EstadosPedido.Todos);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Crear(PedidoRequestDto pedidoRequestDto)
         {
             if (!ModelState.IsValid)
             { return BadRequest(); }
+
+            if (!EstadosPedido.EsValido(pedidoRequestDto.EstadoPedido))
+            { return BadRequest("El estado del pedido no es valido."); }
+
             var pedido = _mapper.Map<Pedido>(pedidoRequestDto);
+
+            // Datos que pone la API, no el usuario
+            pedido.FechaCreacion = DateTime.Now;
+            pedido.TotalAPagar = 0;                       // se calcula al cargar los detalles
+            pedido.EstadoPago = EstadosPago.Pendiente;    // todavia no hay pagos
+
+            if (pedido.FechaEntregaPrometida.Date < pedido.FechaCreacion.Date)
+            { return BadRequest("La fecha de entrega no puede ser anterior a hoy."); }
+
             _pedido.Save(pedido);
             return Ok(pedido.Id);
         }
@@ -73,11 +96,18 @@ namespace CarpinteriaBA.WebApi.Controllers
             if (!ModelState.IsValid)
             { return BadRequest(); }
 
+            if (!EstadosPedido.EsValido(pedidoRequestDto.EstadoPedido))
+            { return BadRequest("El estado del pedido no es valido."); }
+
             Pedido pedidoBack = _pedido.GetById(Id.Value);
 
             if (pedidoBack is null)
             { return NotFound(); }
 
+            if (pedidoRequestDto.FechaEntregaPrometida.Date < pedidoBack.FechaCreacion.Date)
+            { return BadRequest("La fecha de entrega no puede ser anterior a la fecha de creacion del pedido."); }
+
+            // Solo cambia cliente, fecha de entrega y estado. Total y estado de pago no se tocan.
             _mapper.Map(pedidoRequestDto, pedidoBack);
 
             _pedido.Save(pedidoBack);

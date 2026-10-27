@@ -396,20 +396,20 @@ namespace CarpinteriaBA.WebApi.Migrations
                     b.Property<DateTime>("FechaPago")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("IdPedido")
+                        .HasColumnType("int");
+
                     b.Property<int>("IdTipoPago")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Monto")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("PedidoId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("IdTipoPago");
+                    b.HasIndex("IdPedido");
 
-                    b.HasIndex("PedidoId");
+                    b.HasIndex("IdTipoPago");
 
                     b.ToTable("Pagos");
                 });
@@ -523,13 +523,13 @@ namespace CarpinteriaBA.WebApi.Migrations
                     b.HasOne("CarpinteriaBA.Entities.Mueble", "Mueble")
                         .WithMany("DetallesPedidos")
                         .HasForeignKey("IdMueble")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("CarpinteriaBA.Entities.Pedido", "Pedido")
                         .WithMany("DetallesPedidos")
                         .HasForeignKey("IdPedido")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Mueble");
@@ -542,7 +542,7 @@ namespace CarpinteriaBA.WebApi.Migrations
                     b.HasOne("CarpinteriaBA.Entities.Proveedor", "Proveedor")
                         .WithMany("Insumos")
                         .HasForeignKey("IdProveedor")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Proveedor");
@@ -601,15 +601,19 @@ namespace CarpinteriaBA.WebApi.Migrations
 
             modelBuilder.Entity("CarpinteriaBA.Entities.Pago", b =>
                 {
+                    b.HasOne("CarpinteriaBA.Entities.Pedido", "Pedido")
+                        .WithMany("Pagos")
+                        .HasForeignKey("IdPedido")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("CarpinteriaBA.Entities.TipoPago", "TipoPago")
                         .WithMany("Pagos")
                         .HasForeignKey("IdTipoPago")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CarpinteriaBA.Entities.Pedido", null)
-                        .WithMany("Pagos")
-                        .HasForeignKey("PedidoId");
+                    b.Navigation("Pedido");
 
                     b.Navigation("TipoPago");
                 });
@@ -619,7 +623,7 @@ namespace CarpinteriaBA.WebApi.Migrations
                     b.HasOne("CarpinteriaBA.Entities.Cliente", "Cliente")
                         .WithMany("Pedidos")
                         .HasForeignKey("IdCliente")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Cliente");
@@ -630,13 +634,13 @@ namespace CarpinteriaBA.WebApi.Migrations
                     b.HasOne("CarpinteriaBA.Entities.Insumo", "Insumo")
                         .WithMany("RecetasMuebles")
                         .HasForeignKey("IdInsumo")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("CarpinteriaBA.Entities.Mueble", "Mueble")
                         .WithMany("RecetasMuebles")
                         .HasForeignKey("IdMueble")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Insumo");

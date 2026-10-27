@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace CarpinteriaBA.DataAccess
@@ -18,7 +19,7 @@ namespace CarpinteriaBA.DataAccess
         public virtual DbSet<Pago> Pagos { get; set; }
         public virtual DbSet<Pedido> Pedidos { get; set; }
 
-        public virtual DbSet<TipoPago>TiposPagos { get; set; }
+        public virtual DbSet<TipoPago> TiposPagos { get; set; }
         public virtual DbSet<Cliente> Clientes { get; set; }
         public virtual DbSet<Configuracion> Configuraciones { get; set; }
 
@@ -33,6 +34,19 @@ namespace CarpinteriaBA.DataAccess
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
+
+            // Ninguna relacion de las tablas del negocio borra en cascada:
+            // si un registro esta en uso (ej: un Proveedor con Insumos), la base rechaza el borrado.
+            // Se aplica solo a las entidades de CarpinteriaBA.Entities; las de Identity
+            // (CarpinteriaBA.Entities.MicrosoftIdentity) quedan como estan.
+            var relacionesDelNegocio = modelBuilder.Model.GetEntityTypes()
+                .Where(entidad => entidad.ClrType.Namespace == "CarpinteriaBA.Entities")
+                .SelectMany(entidad => entidad.GetForeignKeys());//esto es mejor hacerlo asi que en la migracion con un NoAction porque asi no se rompe la integridad referencial de la base de datos, y ademas es mas facil de mantener, ya que si agrego una nueva entidad con relaciones, no tengo que acordarme de poner el NoAction en la migracion, sino que automaticamente se aplica a todas las relaciones de las entidades del negocio.
+
+            foreach (var relacion in relacionesDelNegocio)
+            {
+                relacion.DeleteBehavior = DeleteBehavior.Restrict;
+            }
         }
     }
 }

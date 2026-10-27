@@ -8,13 +8,19 @@ namespace CarpinteriaBA.Application.DTOs.Pedido
     public class PedidoResponseDto
     {
         public int Id { get; set; }
+
+        // IdCliente: para precargar el select al editar. Cliente: "Nombre Apellido" para mostrar.
+        public int IdCliente { get; set; }
         public string Cliente { get; set; } = null!;
+
         public DateTime FechaCreacion { get; set; }
         public DateTime FechaEntregaPrometida { get; set; }
+
         public decimal TotalAPagar { get; set; }
+        public decimal TotalPagado { get; set; }
+        public decimal Saldo { get; set; }
+
         public string EstadoPedido { get; set; } = null!;
         public string EstadoPago { get; set; } = null!;
-
-        
     }
 }

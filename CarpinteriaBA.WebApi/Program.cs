@@ -5,6 +5,7 @@ using CarpinteriaBA.Entities.MicrosoftIdentity;
 using CarpinteriaBA.Repository;
 using CarpinteriaBA.Services;
 using CarpinteriaBA.Services.AuthServices;
+using CarpinteriaBA.WebApi.Filters; // NUEVO: filtro de registros en uso
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +17,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+// NUEVO: el filtro convierte los errores de clave foranea (registro en uso) en un 400 con mensaje claro
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<RegistroEnUsoExceptionFilter>();
+});
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
 const string FrontendCorsPolicy = "Frontend";
@@ -32,28 +37,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 
 
-//builder.Services.AddSwaggerGen(c =>
-//{
-//    c.SwaggerDoc("v1", new OpenApiInfo { Title = "CarpinteriaBA.WebApi", Version = "v1" });
-//    var jwtSecurityScheme = new OpenApiSecurityScheme
-//    {
-//        BearerFormat = "JWT",
-//        Name = "JWT Authentication",
-//        In = ParameterLocation.Header,
-//        Type = SecuritySchemeType.Http,
-//        Scheme = JwtBearerDefaults.AuthenticationScheme,
-//        Description = "Put your Token below",
 
-//        Reference = new OpenApiReference
-//        {
-//            Id = JwtBearerDefaults.AuthenticationScheme,
-//            Type = ReferenceType.SecurityScheme
-//        }
-//    };
-//    c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
-//    c.AddSecurityRequirement(new OpenApiSecurityRequirement { { jwtSecurityScheme, Array.Empty<string>() } });
-//});
-//
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "CarpinteriaBA.WebApi", Version = "v1" });
@@ -80,7 +64,7 @@ builder.Services.AddSwaggerGen(c =>
 
     });
 });
-//
+
 builder.Services.AddDbContext<DbDataAccess>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -109,14 +93,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-//builder.Services.AddIdentity<User, Role>(
-//    options => options.SignIn.RequireConfirmedAccount = true).
-//    AddDefaultTokenProviders().
-//    AddEntityFrameworkStores<DbDataAccess>().
-//    AddSignInManager<SignInManager<User>>().
-//    AddRoleManager<RoleManager<Role>>().
-//    AddUserManager<UserManager<User>>();
-
 builder.Services.AddIdentity<User, Role>(
     options => options.SignIn.RequireConfirmedAccount = true).
     AddDefaultTokenProviders().
@@ -134,7 +110,7 @@ builder.Services.AddScoped(typeof(ITokenHandlerService), typeof(TokenHandlerServ
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
