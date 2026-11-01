@@ -31,7 +31,7 @@ namespace CarpinteriaBA.WebApi.Controllers.Identity
         // Solo un usuario con sesion iniciada con el token valido puede registrar usuarios nuevos
         [HttpPost]
         [Route("Register")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> RegistrarUsuario([FromBody] UserRegistroRequestDto user)
         {
             if (ModelState.IsValid)
