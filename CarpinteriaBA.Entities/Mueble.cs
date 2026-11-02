@@ -14,6 +14,7 @@ namespace CarpinteriaBA.Entities
         {
             RecetasMuebles = new HashSet<RecetaMueble>();
             DetallesPedidos = new HashSet<DetallePedido>();
+            ConfiguracionesExtra = new HashSet<MuebleConfiguracion>();
         }
         public int Id { get; set; }
         [StringLength(30)]
@@ -23,6 +24,9 @@ namespace CarpinteriaBA.Entities
         public decimal PrecioSugerido { get; set; }
         public virtual ICollection<RecetaMueble> RecetasMuebles { get; set; }
         public virtual ICollection<DetallePedido> DetallesPedidos { get; set; }
+
+        // Recargos opcionales elegidos para este mueble (IVA, Servicio personalizado, etc.)
+        public virtual ICollection<MuebleConfiguracion> ConfiguracionesExtra { get; set; }
 
         /// <summary>
         /// Suma del costo de todos los insumos de la receta, con precios de costo ACTUALES.

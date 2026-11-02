@@ -23,6 +23,9 @@ namespace CarpinteriaBA.DataAccess
         public virtual DbSet<Cliente> Clientes { get; set; }
         public virtual DbSet<Configuracion> Configuraciones { get; set; }
 
+        // Recargos opcionales por mueble (relacion Mueble <-> Configuracion)
+        public virtual DbSet<MuebleConfiguracion> MueblesConfiguraciones { get; set; }
+
         public DbDataAccess(DbContextOptions<DbDataAccess> options) : base(options) { }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.LogTo(Console.WriteLine).EnableDetailedErrors();//aca estoy configurando el log para que me muestre los errores detallados en la consola,
                                                                                                                                                         //esto es para poder debuggear mejor y ver que esta pasando con las consultas a la base de datos.

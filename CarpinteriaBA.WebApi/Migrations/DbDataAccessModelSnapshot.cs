@@ -385,6 +385,29 @@ namespace CarpinteriaBA.WebApi.Migrations
                     b.ToTable("Muebles");
                 });
 
+            modelBuilder.Entity("CarpinteriaBA.Entities.MuebleConfiguracion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("IdConfiguracion")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdMueble")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdConfiguracion");
+
+                    b.HasIndex("IdMueble");
+
+                    b.ToTable("MueblesConfiguraciones");
+                });
+
             modelBuilder.Entity("CarpinteriaBA.Entities.Pago", b =>
                 {
                     b.Property<int>("Id")
@@ -599,6 +622,25 @@ namespace CarpinteriaBA.WebApi.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("CarpinteriaBA.Entities.MuebleConfiguracion", b =>
+                {
+                    b.HasOne("CarpinteriaBA.Entities.Configuracion", "Configuracion")
+                        .WithMany()
+                        .HasForeignKey("IdConfiguracion")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CarpinteriaBA.Entities.Mueble", "Mueble")
+                        .WithMany("ConfiguracionesExtra")
+                        .HasForeignKey("IdMueble")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Configuracion");
+
+                    b.Navigation("Mueble");
+                });
+
             modelBuilder.Entity("CarpinteriaBA.Entities.Pago", b =>
                 {
                     b.HasOne("CarpinteriaBA.Entities.Pedido", "Pedido")
@@ -660,6 +702,8 @@ namespace CarpinteriaBA.WebApi.Migrations
 
             modelBuilder.Entity("CarpinteriaBA.Entities.Mueble", b =>
                 {
+                    b.Navigation("ConfiguracionesExtra");
+
                     b.Navigation("DetallesPedidos");
 
                     b.Navigation("RecetasMuebles");

@@ -41,12 +41,14 @@ namespace CarpinteriaBA.WebApi.Controllers
         {
             var margenes = ObtenerMargenes();
             var muebles = _mueble.GetAll();
-            var resultado = _mapper.Map<IList<MuebleResponseDto>>(muebles);
+            var resultado = new List<MuebleResponseDto>();
 
-            // Se completa el precio calculado de cada mueble con los margenes actuales
-            foreach (var dto in resultado)
+            // Se completa el precio calculado de cada mueble (margenes + sus recargos)
+            foreach (var mueble in muebles)
             {
-                dto.PrecioCalculado = CalcularPrecio(dto.CostoMateriales, margenes);
+                var dto = _mapper.Map<MuebleResponseDto>(mueble);
+                dto.PrecioCalculado = CalcularDesglose(mueble, margenes).PrecioCalculado;
+                resultado.Add(dto);
             }
             return Ok(resultado);
         }
@@ -65,13 +67,12 @@ namespace CarpinteriaBA.WebApi.Controllers
                 return NotFound();
             }
             var dto = _mapper.Map<MuebleResponseDto>(mueble);
-            dto.PrecioCalculado = CalcularPrecio(dto.CostoMateriales, ObtenerMargenes());
+            dto.PrecioCalculado = CalcularDesglose(mueble, ObtenerMargenes()).PrecioCalculado;
             return Ok(dto);
         }
 
-        
         // GET api/Muebles/Costos?Id=...
-        // Desglose: materiales + mano de obra + uso de maquinas = precio calculado.
+        // Desglose: materiales + mano de obra + uso de maquinas = subtotal; + recargos = precio calculado.
         [HttpGet]
         [Route("Costos")]
         public async Task<IActionResult> Costos(int? Id)
@@ -86,28 +87,9 @@ namespace CarpinteriaBA.WebApi.Controllers
                 return NotFound();
             }
 
-            var margenes = ObtenerMargenes();
-            decimal materiales = mueble.CostoMateriales;
-            decimal precioCalculado = CalcularPrecio(materiales, margenes);
-
-            return Ok(new MuebleCostoDto
-            {
-                IdMueble = mueble.Id,
-                Mueble = mueble.Nombre,
-                CostoMateriales = materiales,
-                ProporcionManoDeObra = margenes.ManoDeObra,
-                ManoDeObra = Math.Round(materiales * margenes.ManoDeObra, 2),
-                ProporcionUsoDeMaquinas = margenes.UsoDeMaquinas,
-                UsoDeMaquinas = Math.Round(materiales * margenes.UsoDeMaquinas, 2),
-                PrecioCalculado = precioCalculado,
-                PrecioSugerido = mueble.PrecioSugerido,
-                Diferencia = mueble.PrecioSugerido - precioCalculado,
-                TieneReceta = mueble.RecetasMuebles.Any(),
-                MargenesConfigurados = margenes.Configurados
-            });
+            return Ok(CalcularDesglose(mueble, ObtenerMargenes()));
         }
 
-        
         // PATCH api/Muebles/UsarPrecioCalculado?Id=...
         // Copia el precio calculado al precio sugerido (boton "Usar precio calculado").
         [HttpPatch]
@@ -128,7 +110,7 @@ namespace CarpinteriaBA.WebApi.Controllers
             if (!margenes.Configurados)
             { return BadRequest($"Faltan los margenes en Configuracion (\"{ClavesConfiguracion.ManoDeObra}\" y \"{ClavesConfiguracion.UsoDeMaquinas}\")."); }
 
-            muebleBack.PrecioSugerido = CalcularPrecio(muebleBack.CostoMateriales, margenes);
+            muebleBack.PrecioSugerido = CalcularDesglose(muebleBack, margenes).PrecioCalculado;
             _mueble.Save(muebleBack);
 
             return Ok(muebleBack.PrecioSugerido);
@@ -179,7 +161,7 @@ namespace CarpinteriaBA.WebApi.Controllers
 
         // ---- Calculo de precio ----
 
-        //Margenes de Configuracion. Si falta alguno, cuenta como 0
+        // Margenes de Configuracion. Si falta alguno, cuenta como 0
         private (decimal ManoDeObra, decimal UsoDeMaquinas, bool Configurados) ObtenerMargenes()
         {
             var configuraciones = _configuracion.GetAll();
@@ -191,11 +173,55 @@ namespace CarpinteriaBA.WebApi.Controllers
                     manoDeObra is not null && usoDeMaquinas is not null);
         }
 
-        //Precio = materiales x (1 + mano de obra + uso de maquinas). Ej: 10.000 x 2,6 = 26.000
-        private static decimal CalcularPrecio(decimal costoMateriales,
+        /// <summary>
+        /// Calcula el precio completo de un mueble:
+        ///   1) Subtotal = materiales + mano de obra (% materiales) + uso de maquinas (% materiales)
+        ///   2) Cada recargo del mueble se aplica como % sobre el precio acumulado hasta ese momento.
+        /// Ej: materiales 10.000 -> subtotal 26.000 -> +10% servicio = 28.600 -> +21% IVA = 34.606
+        /// </summary>
+        private static MuebleCostoDto CalcularDesglose(Mueble mueble,
             (decimal ManoDeObra, decimal UsoDeMaquinas, bool Configurados) margenes)
         {
-            return Math.Round(costoMateriales * (1 + margenes.ManoDeObra + margenes.UsoDeMaquinas), 2);
+            decimal materiales = mueble.CostoMateriales;
+            decimal manoDeObra = Math.Round(materiales * margenes.ManoDeObra, 2);
+            decimal usoDeMaquinas = Math.Round(materiales * margenes.UsoDeMaquinas, 2);
+            decimal subtotal = materiales + manoDeObra + usoDeMaquinas;
+
+            var recargos = new List<RecargoCostoDto>();
+            decimal acumulado = subtotal;
+
+            foreach (var extra in mueble.ConfiguracionesExtra.OrderBy(e => e.Id))
+            {
+                decimal monto = Math.Round(acumulado * extra.Configuracion.Valor, 2);
+                recargos.Add(new RecargoCostoDto
+                {
+                    IdMuebleConfiguracion = extra.Id,
+                    IdConfiguracion = extra.IdConfiguracion,
+                    Clave = extra.Configuracion.Clave,
+                    Proporcion = extra.Configuracion.Valor,
+                    BaseCalculo = acumulado,
+                    Monto = monto
+                });
+                acumulado += monto;
+            }
+
+            return new MuebleCostoDto
+            {
+                IdMueble = mueble.Id,
+                Mueble = mueble.Nombre,
+                CostoMateriales = materiales,
+                ProporcionManoDeObra = margenes.ManoDeObra,
+                ManoDeObra = manoDeObra,
+                ProporcionUsoDeMaquinas = margenes.UsoDeMaquinas,
+                UsoDeMaquinas = usoDeMaquinas,
+                Subtotal = subtotal,
+                Recargos = recargos,
+                PrecioCalculado = acumulado,
+                PrecioSugerido = mueble.PrecioSugerido,
+                Diferencia = mueble.PrecioSugerido - acumulado,
+                TieneReceta = mueble.RecetasMuebles.Any(),
+                MargenesConfigurados = margenes.Configurados
+            };
         }
     }
 }

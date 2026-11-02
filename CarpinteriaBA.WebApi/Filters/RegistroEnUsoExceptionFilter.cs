@@ -23,7 +23,8 @@ namespace CarpinteriaBA.WebApi.Filters
             ["Pagos"] = "pagos",
             ["Pedidos"] = "pedidos",
             ["DetallesPedidos"] = "detalles de pedidos",
-            ["RecetasMuebles"] = "recetas de muebles"
+            ["RecetasMuebles"] = "recetas de muebles",
+            ["MueblesConfiguraciones"] = "muebles con este recargo"
         };
 
         public void OnException(ExceptionContext context)
