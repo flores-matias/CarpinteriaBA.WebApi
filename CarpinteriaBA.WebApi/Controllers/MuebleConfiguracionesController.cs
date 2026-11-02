@@ -10,10 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CarpinteriaBA.WebApi.Controllers
 {
-    /// <summary>
-    /// Recargos opcionales de cada mueble (IVA, Servicio personalizado, etc.).
-    /// "Mano de obra" y "Uso de maquinas" NO van aca: se aplican siempre a todos los muebles.
-    /// </summary>
+    
+    // Recargos opcionales de cada mueble (IVA, Servicio personalizado, etc.).
+    // "Mano de obra" y "Uso de maquinas" NO van aca: se aplican siempre a todos los muebles.
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
@@ -41,7 +40,7 @@ namespace CarpinteriaBA.WebApi.Controllers
             _mapper = mapper;
         }
 
-        /// <summary>GET api/MuebleConfiguraciones/ByMueble?IdMueble=... Recargos de un mueble.</summary>
+        //GET api/MuebleConfiguraciones/ByMueble?IdMueble=... Recargos de un mueble.
         [HttpGet]
         [Route("ByMueble")]
         public async Task<IActionResult> ByMueble(int? IdMueble)
@@ -59,7 +58,7 @@ namespace CarpinteriaBA.WebApi.Controllers
                 mueble.ConfiguracionesExtra.OrderBy(e => e.Id).ToList()));
         }
 
-        /// <summary>POST api/MuebleConfiguraciones: agrega un recargo a un mueble.</summary>
+        //POST api/MuebleConfiguraciones: agrega un recargo a un mueble.
         [HttpPost]
         public async Task<IActionResult> Crear(MuebleConfiguracionRequestDto dto)
         {
@@ -86,7 +85,7 @@ namespace CarpinteriaBA.WebApi.Controllers
             return Ok(muebleConfiguracion.Id);
         }
 
-        /// <summary>DELETE api/MuebleConfiguraciones?Id=...: quita un recargo del mueble.</summary>
+        //DELETE api/MuebleConfiguraciones?Id=...: quita un recargo del mueble.
         [HttpDelete]
         public async Task<IActionResult> Borrar(int? Id)
         {

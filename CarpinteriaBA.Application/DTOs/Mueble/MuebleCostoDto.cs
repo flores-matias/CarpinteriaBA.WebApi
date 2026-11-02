@@ -2,11 +2,10 @@
 
 namespace CarpinteriaBA.Application.DTOs.Mueble
 {
-    /// <summary>
-    /// Desglose del precio de un mueble:
-    /// Materiales + Mano de obra + Uso de maquinas = Subtotal
-    /// Subtotal + recargos opcionales (cada uno sobre el acumulado) = Precio calculado.
-    /// </summary>
+    
+    // Desglose del precio de un mueble:
+    // Materiales + Mano de obra + Uso de maquinas = Subtotal
+    // Subtotal + recargos opcionales (cada uno sobre el acumulado) = Precio calculado.
     public class MuebleCostoDto
     {
         public int IdMueble { get; set; }
@@ -37,7 +36,7 @@ namespace CarpinteriaBA.Application.DTOs.Mueble
         public bool MargenesConfigurados { get; set; }
     }
 
-    /// <summary>Un renglon de recargo en el desglose (ej: IVA 21% sobre $28.600 = $6.006).</summary>
+    // Un renglon de recargo en el desglose (ej: IVA 21% sobre $28.600 = $6.006).
     public class RecargoCostoDto
     {
         // Id del registro MuebleConfiguracion (para poder quitar el recargo desde el front)

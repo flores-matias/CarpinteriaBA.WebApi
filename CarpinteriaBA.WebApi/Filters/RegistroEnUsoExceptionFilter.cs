@@ -6,11 +6,10 @@ using System.Text.RegularExpressions;
 
 namespace CarpinteriaBA.WebApi.Filters
 {
-    /// <summary>
-    /// Convierte los errores de clave foranea de SQL Server (error 547) en un 400 con mensaje claro.
-    /// Ej: borrar un Proveedor que tiene Insumos -> "No se puede eliminar porque hay insumos que lo usan."
-    /// Se registra una sola vez en Program.cs y aplica a todos los controllers.
-    /// </summary>
+    
+    // Convierte los errores de clave foranea de SQL Server (error 547) en un 400 con mensaje claro.
+    // Ej: borrar un Proveedor que tiene Insumos -> "No se puede eliminar porque hay insumos que lo usan."
+    // Se registra una sola vez en Program.cs y aplica a todos los controllers.
     public class RegistroEnUsoExceptionFilter : IExceptionFilter
     {
         // Numero de error de SQL Server para "conflicto con una restriccion de clave foranea"
